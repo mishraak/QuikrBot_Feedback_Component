@@ -1,4 +1,4 @@
- {import axios from 'axios';
+import axios from 'axios';
 import { FETCH_USER, FETCH_SURVEYS }  from './types';
 
 export const fetchUser = () => {

@@ -44,4 +44,15 @@ app.get('/', (req, res) => {
 
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT);
+app.listen(PORT, function(){
+	console.log("Listening on port : 5000 ");
+});
+
+/*
+
+Renaming shielded-badlands-75179 to cmpe295b... done
+https://cmpe295b.herokuapp.com/ | https://git.heroku.com/cmpe295b.git
+Git remote heroku updated
+ ▸    Don't forget to update git remotes for all other local checkouts of the app.
+
+*/
