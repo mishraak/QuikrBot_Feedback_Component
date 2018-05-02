@@ -63,7 +63,7 @@ module.exports = app => {
 	app.post("/api/surveys", requireLogin, requireCredits, async (req, res) => {
 		const { title, subject, body, recipients } = req.body;
 		console.log("req");
-		console.log(req.body);
+		console.log(req);
 		const survey = new Survey({
 			title,
 			subject,
@@ -71,7 +71,7 @@ module.exports = app => {
 			recipients: recipients.split(",").map(email => {
 				return { email: email.trim() };
 			}),
-			_user: req.user.id,
+			_user: req.user.id,			
 			dateSent: Date.now()
 		});
 		try {
@@ -86,4 +86,38 @@ module.exports = app => {
 			res.status(422).send({ err });
 		}
 	});
+
+	app.post("/api/surveys/node", requireLogin, requireCredits, async (req, res) => {
+		console.log(req);
+		const { title, subject, body, recipients, user } = req.body;
+		//console.log("req");
+		//console.log(req);
+		const survey = new Survey({
+			title,
+			subject,
+			body,
+			recipients: recipients.split(",").map(email => {
+				return { email: email.trim() };
+			}),
+			_user: user,			
+			dateSent: Date.now()
+		});
+		try {
+			//construct Mail
+			const mailer = new Mailer(survey, surveyTemplate(survey));
+			await mailer.send();
+			const my = await survey.save();
+			//req.user.credits = req.user.credits - 1;
+			const user = await req.user.save();
+			res.send(user);
+		} catch (err) {
+			res.status(422).send({ err });
+		}
+	});
+
+
+
+
+
+
 };
