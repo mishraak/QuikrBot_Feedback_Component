@@ -22,14 +22,17 @@ module.exports = app => {
 	});
 
 	app.post("/api/surveys/webhooks", (req, res) => {
-		console.log("webhook request body : \n " + req.body);
+		console.log("webhook request body : \n ");
+		console.log(req.body);
 
 		const p = new Path("/api/surveys/:surveyId/:choice");
 
-		const events = _.chain(req.bo)
-			.map(({ email, url }) => {
+		const events = _.chain(req.body)
+			.map(({ email, url }) => {				
+
 				const match = p.test(new URL(url).pathname);
 				if (match) {
+					console.log("in match");
 					return {
 						email,
 						surveyId: match.surveyId,
@@ -40,9 +43,38 @@ module.exports = app => {
 			.compact()
 			.uniqBy("email", "surveyId")
 			.each(({ surveyId, email, choice }) => {
+				console.log("surveyId");
+				console.log(surveyId);
+
+				console.log("email");
+				console.log(email);
+
+				console.log("choice");
+				console.log(choice);
+				/*
+				mongo.connect("mongodb://prodowner:prodroot@ds111138.mlab.com:11138/prodfeedbackapp", function(){
+			        var coll = mongo.collection('surveys');
+			        db.inventory.updateOne(
+					   { 
+					   		title: "Teaching Evaluation" 
+					   },
+					   {
+					     $set: { 
+					     	"title": "new Title"
+					 	},
+					     $currentDate: { 
+					     	lastModified: true 
+					     }
+					   }
+					)
+			    });
+
+			    */							
+
+				
 				Survey.updateOne(
 					{
-						_id: surveyId,
+						_id: surveyId,						
 						recipients: {
 							$elemMatch: { email: email, responded: false }
 						}
@@ -52,7 +84,10 @@ module.exports = app => {
 						$set: { "recipients.$.responded": true },
 						lastResponded: new Date()
 					}
-				).exec();
+				).exec(function(err, affected, res){
+					console.log(affected);
+				});
+				
 			})
 			.value();
 
@@ -62,8 +97,8 @@ module.exports = app => {
 
 	app.post("/api/surveys", requireLogin, requireCredits, async (req, res) => {
 		const { title, subject, body, recipients } = req.body;
-		console.log("req");
-		console.log(req);
+		//console.log("req");
+		//console.log(req);
 		const survey = new Survey({
 			title,
 			subject,
