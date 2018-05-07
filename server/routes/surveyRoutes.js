@@ -11,7 +11,7 @@ const Survey = mongoose.model("surveys");
 
 module.exports = app => {
 	app.get("/api/surveys", requireLogin, async (req, res) => {
-		const surveys = await Survey.find({ _user: req.user.id }).select({
+		const surveys = await Survey.find({ }).select({
 			recipients: false
 		});
 		res.send(surveys);
@@ -51,26 +51,6 @@ module.exports = app => {
 
 				console.log("choice");
 				console.log(choice);
-				/*
-				mongo.connect("mongodb://prodowner:prodroot@ds111138.mlab.com:11138/prodfeedbackapp", function(){
-			        var coll = mongo.collection('surveys');
-			        db.inventory.updateOne(
-					   { 
-					   		title: "Teaching Evaluation" 
-					   },
-					   {
-					     $set: { 
-					     	"title": "new Title"
-					 	},
-					     $currentDate: { 
-					     	lastModified: true 
-					     }
-					   }
-					)
-			    });
-
-			    */							
-
 				
 				Survey.updateOne(
 					{
